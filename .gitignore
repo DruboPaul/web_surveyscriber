@@ -1,0 +1,25 @@
+﻿# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build outputs
+dist/
+build/
+*.exe
+
+# IDE
+.idea/
+.vscode/
+
+# User data
+.surveyscriber/
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log

@@ -1,0 +1,1146 @@
+/* ================================================
+   SurveyScriber - Modern Survey Extraction UI
+   ================================================ */
+
+:root {
+  --primary: #14b8a6;
+  --primary-dark: #0d9488;
+  --primary-light: #2dd4bf;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --warning: #f59e0b;
+  --bg-dark: #0c1222;
+  --bg-card: #1a2744;
+  --bg-input: #243654;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border: #3d5278;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  --radius: 12px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.app {
+  min-height: 100vh;
+  min-width: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================================================
+   Header
+   ================================================ */
+.header {
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Enterprise badge removed - cleaner header */
+
+/* ================================================
+   Main Content
+   ================================================ */
+.main-content {
+  flex: 1;
+  padding: 2rem 3rem;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.workflow-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ================================================
+   Step Sections
+   ================================================ */
+.step-section {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.step-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ================================================
+   Image Uploader
+   ================================================ */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--bg-input);
+}
+
+.drop-zone:hover,
+.drop-zone.dragging {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.drop-content .upload-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.drop-content p {
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.drop-content .hint {
+  font-size: 0.9rem;
+  color: var(--primary-light);
+}
+
+.drop-content .formats {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.preview-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-input);
+}
+
+.preview-item img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.preview-item .remove-preview {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-item .file-name {
+  display: block;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-count {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--success-light);
+  color: #065f46;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.clear-all-btn {
+  display: block;
+  margin: 0.75rem auto 0;
+  padding: 0.5rem 1rem;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-all-btn:hover {
+  background: #b91c1c;
+  transform: scale(1.05);
+}
+
+/* ================================================
+   Time Estimate Display
+   ================================================ */
+.time-estimate {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+}
+
+.time-estimate.ok {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.time-estimate.caution {
+  border-color: var(--warning);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.time-estimate.warning {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.time-estimate.danger {
+  border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.estimate-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.estimate-icon {
+  font-size: 1.2rem;
+}
+
+.estimate-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.estimate-time {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.estimate-warning {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.time-estimate.caution .estimate-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+
+.time-estimate.warning .estimate-warning {
+  background: rgba(249, 115, 22, 0.15);
+  color: #ea580c;
+}
+
+.time-estimate.danger .estimate-warning {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+/* ================================================
+   Upload Mode Toggle
+   ================================================ */
+.upload-mode-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.mode-btn.active {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+}
+
+/* ================================================
+   Custom Filename Input
+   ================================================ */
+.filename-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-input);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.filename-section label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.filename-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filename-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.filename-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.filename-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.filename-extension {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.filename-hint {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ================================================
+   Output Settings Panel (appears during extraction)
+   ================================================ */
+.output-settings-panel {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.08) 0%, rgba(20, 184, 166, 0.03) 100%);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.output-settings-panel h4 {
+  color: var(--primary-light);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.output-settings-panel .settings-hint {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* ================================================
+   Folder Selection (Auto-Save)
+   ================================================ */
+.input-group {
+  margin-top: 1rem;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.folder-selection {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.select-folder-btn {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select-folder-btn:hover {
+  border-color: var(--primary);
+  background: rgba(20, 184, 166, 0.1);
+}
+
+.format-select {
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.format-select:hover {
+  border-color: var(--primary);
+}
+
+.format-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Auto-save success display */
+.auto-save-success {
+  text-align: center;
+  padding: 1rem;
+}
+
+.auto-save-success p {
+  margin-bottom: 0.5rem;
+  color: var(--success);
+}
+
+.path-display {
+  display: block;
+  padding: 0.75rem 1rem;
+  background: var(--bg-input);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  word-break: break-all;
+}
+
+.open-folder-btn {
+  padding: 0.5rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.open-folder-btn:hover {
+  border-color: var(--primary);
+  background: rgba(20, 184, 166, 0.1);
+}
+
+/* Refresh/Reset Button */
+.refresh-btn {
+  display: block;
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.refresh-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.4);
+}
+
+/* ================================================
+   OCR Engine Selector
+   ================================================ */
+.ocr-engine-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-input);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.ocr-engine-section label {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.ocr-engine-toggle {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.ocr-btn {
+  flex: 1;
+  padding: 1rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ocr-btn:hover {
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.ocr-btn.active {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(45, 212, 191, 0.1) 100%);
+  color: var(--primary-light);
+}
+
+.ocr-desc {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.ocr-hint {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+/* ================================================
+   Schema Editor
+   ================================================ */
+.schema-editor h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.schema-editor .hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.fields-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.field-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.field-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.field-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.remove-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.remove-btn:hover {
+  background: #dc2626;
+}
+
+.add-field-btn {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px dashed var(--border);
+  color: var(--primary-light);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.add-field-btn:hover {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* ================================================
+   Extract Button
+   ================================================ */
+.extract-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.extract-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+.extract-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.extract-btn.loading {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ================================================
+   Status Messages
+   ================================================ */
+.status-message {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 8px;
+  text-align: center;
+  color: var(--primary-light);
+}
+
+.error-message {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--danger-light);
+  color: #991b1b;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* ================================================
+   Results Card
+   ================================================ */
+.results-card {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border: 1px solid var(--success);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.results-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--success);
+}
+
+.results-card p {
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.download-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.download-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.download-btn.excel {
+  background: #16a34a;
+  color: white;
+}
+
+.download-btn.excel:hover {
+  background: #15803d;
+}
+
+.download-btn.csv {
+  background: var(--primary);
+  color: white;
+}
+
+.download-btn.csv:hover {
+  background: var(--primary-dark);
+}
+
+/* ================================================
+   Enhanced Progress Bar
+   ================================================ */
+.progress-container {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background: var(--bg-input);
+  border-radius: 10px;
+  border: 1px solid var(--primary);
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.1);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.progress-stage {
+  font-weight: 600;
+  color: var(--primary-light);
+  font-size: 0.95rem;
+}
+
+.progress-timer {
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.remaining-time {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 16px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 50%, var(--success) 100%);
+  border-radius: 8px;
+  transition: width 0.4s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.progress-percent {
+  font-weight: 600;
+  color: var(--primary-light);
+}
+
+/* Terminate Button */
+.terminate-btn {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.terminate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+}
+
+/* ================================================
+   Settings Section at Bottom
+   ================================================ */
+.settings-section {
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(20, 184, 166, 0.05) 100%);
+  border: 1px dashed var(--border);
+}
+
+.settings-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.open-settings-btn {
+  padding: 0.875rem 1.5rem;
+  background: var(--bg-input);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.open-settings-btn:hover {
+  border-color: var(--primary);
+  background: rgba(20, 184, 166, 0.1);
+  color: var(--primary-light);
+}
+
+/* ================================================
+   Footer
+   ================================================ */
+.footer {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ================================================
+   Responsive - Tablet
+   ================================================ */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 1.5rem 2rem;
+    max-width: 100%;
+  }
+}
+
+/* ================================================
+   Responsive - Mobile
+   ================================================ */
+@media (max-width: 640px) {
+  .app {
+    min-width: auto;
+  }
+
+  .header {
+    padding: 1.5rem 1rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .header p {
+    font-size: 0.95rem;
+  }
+
+  .enterprise-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+
+  .step-section {
+    padding: 1rem;
+  }
+
+  .step-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .step-number {
+    width: 30px;
+    height: 30px;
+    font-size: 0.95rem;
+  }
+
+  .drop-zone {
+    padding: 1.5rem;
+  }
+
+  .drop-content .upload-icon {
+    font-size: 2rem;
+  }
+
+  .upload-mode-toggle {
+    flex-direction: column;
+  }
+
+  .ocr-engine-toggle {
+    flex-direction: column;
+  }
+
+  .ocr-btn {
+    padding: 0.75rem;
+  }
+
+  .filename-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filename-extension {
+    text-align: center;
+  }
+
+  .extract-btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .download-buttons {
+    flex-direction: column;
+  }
+
+  .download-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .preview-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .preview-item img {
+    height: 70px;
+  }
+
+  .time-estimate {
+    padding: 0.75rem;
+  }
+
+  .estimate-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .results-card {
+    padding: 1rem;
+  }
+
+  .footer {
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ================================================
+   Settings Section Button
+   ================================================ */
+.settings-header-btn {
+  width: 100%;
+  padding: 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  border-radius: var(--radius);
+}
+
+.settings-header-btn:hover {
+  background: rgba(20, 184, 166, 0.08);
+}
+
+.settings-header-btn h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.settings-header-btn .settings-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.settings-section {
+  padding: 0;
+  overflow: hidden;
+}
