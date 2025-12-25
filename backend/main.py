@@ -22,7 +22,12 @@ app = FastAPI(
 # ===============================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # for development only
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://*.netlify.app",
+        "https://surveyscriber.netlify.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -66,3 +71,12 @@ app.mount(
     StaticFiles(directory="data"),
     name="data"
 )
+
+
+
+# ===============================
+# Health Check (for Render)
+# ===============================
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "surveyscriber-api"}
