@@ -241,16 +241,36 @@ def reset_database_engine():
 # AI Provider Validation Endpoints
 # ==========================================
 
+from fastapi import Request
+
 @router.post("/settings/test-ai")
-def test_ai_connection():
+def test_ai_connection(request: Request):
     """
     Test the currently configured AI provider API key.
-    Makes a minimal API call to verify the key works.
+    
+    Accepts credentials from:
+    1. Request headers (X-AI-Provider, X-AI-API-Key) - preferred for web security
+    2. Fallback to server-stored settings (for desktop app)
+    
     Returns: { valid: bool, provider: str, message: str }
     """
-    settings = load_settings()
-    provider = settings.get("ai_provider", "openai")
-    api_key = settings.get("ai_api_key") or settings.get("openai_api_key")
+    # Try to get credentials from request headers first (secure per-user keys)
+    provider = request.headers.get("X-AI-Provider", "")
+    api_key = request.headers.get("X-AI-API-Key", "")
+    custom_endpoint = request.headers.get("X-Custom-Endpoint", "")
+    custom_model = request.headers.get("X-Custom-Model", "")
+    
+    # Fallback to server settings if no header credentials
+    if not api_key and not provider:
+        settings = load_settings()
+        provider = settings.get("ai_provider", "openai")
+        api_key = settings.get("ai_api_key") or settings.get("openai_api_key")
+        custom_endpoint = settings.get("custom_endpoint", "")
+        custom_model = settings.get("custom_model", "")
+    
+    # Default provider if still empty
+    if not provider:
+        provider = "openai"
     
     if not api_key and provider != "custom":
         return {
@@ -267,9 +287,7 @@ def test_ai_connection():
         elif provider == "google":
             return _test_google(api_key)
         elif provider == "custom":
-            endpoint = settings.get("custom_endpoint", "")
-            model = settings.get("custom_model", "")
-            return _test_custom(api_key, endpoint, model)
+            return _test_custom(api_key, custom_endpoint, custom_model)
         else:
             return {
                 "valid": False,

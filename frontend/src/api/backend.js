@@ -1,8 +1,25 @@
 // Central API client for backend communication
+import { getStoredSettings, getApiKey } from '../utils/secureStorage';
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 // Chunk size for large uploads
 const CHUNK_SIZE = 100;
+
+/**
+ * Get headers with API credentials for extraction requests
+ * API keys are stored in localStorage and sent with each request
+ */
+function getAuthHeaders() {
+    const settings = getStoredSettings();
+    return {
+        'Content-Type': 'application/json',
+        'X-AI-Provider': settings.ai_provider || 'openai',
+        'X-AI-API-Key': settings.ai_api_key || '',
+        'X-Custom-Endpoint': settings.custom_endpoint || '',
+        'X-Custom-Model': settings.custom_model || '',
+    };
+}
+
 
 /* ==============================
    1️⃣ Upload Images (Chunked for large batches)
@@ -88,9 +105,7 @@ export async function uploadImagesChunked(files, onProgress = null) {
 export async function extractBatch(batchId, schema, customFilename = null) {
     const response = await fetch(`${BASE_URL}/extract/batch`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
             batch_id: batchId,
             schema: schema,
@@ -111,9 +126,7 @@ export async function extractBatch(batchId, schema, customFilename = null) {
 export async function extractBatchAsync(batchId, schema, customFilename = null) {
     const response = await fetch(`${BASE_URL}/extract/batch/async`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
             batch_id: batchId,
             schema: schema,
@@ -220,7 +233,7 @@ export function getCsvDownloadUrl(csvPath) {
 export async function testAiConnection() {
     const response = await fetch(`${BASE_URL}/api/settings/test-ai`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" }
+        headers: getAuthHeaders()
     });
 
     if (!response.ok) {

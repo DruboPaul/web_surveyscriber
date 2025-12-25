@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { testAiConnection } from '../api/backend';
+import { getStoredSettings, saveSettings as saveToLocalStorage, clearAllSettings, hasApiKey } from '../utils/secureStorage';
 import './Settings.css';
 
 // Dynamic BASE_URL from environment variable
@@ -152,17 +153,22 @@ export default function Settings({ isOpen, onClose }) {
     async function loadSettings() {
         setLoading(true);
         setError(null);
+
+        // Load AI credentials from localStorage (SECURE - never sent to server for storage)
+        const localSettings = getStoredSettings();
+        setAiProvider(localSettings.ai_provider || 'openai');
+        setAiApiKey(''); // Don't show saved key
+        setAiKeyIsSaved(Boolean(localSettings.ai_api_key));
+        setCustomEndpoint(localSettings.custom_endpoint || '');
+        setCustomModel(localSettings.custom_model || '');
+        setOcrProvider(localSettings.ocr_provider || 'none');
+
+        // Load other settings from server (non-sensitive)
         try {
             const response = await fetch(`${BASE_URL}/api/settings/raw`);
             if (response.ok) {
                 const data = await response.json();
-                setAiProvider(data.ai_provider || 'openai');
-                setAiApiKey('');
-                setAiKeyIsSaved(Boolean(data.ai_api_key || data.openai_api_key));
-                setCustomEndpoint(data.custom_endpoint || '');
-                setCustomModel(data.custom_model || '');
-                // OCR settings
-                setOcrProvider(data.ocr_provider || 'none');
+                // OCR cloud provider keys (if using cloud OCR)
                 setGoogleVisionKey('');
                 setGoogleKeyIsSaved(Boolean(data.google_vision_key));
                 setAzureOcrKey('');
@@ -184,7 +190,7 @@ export default function Settings({ isOpen, onClose }) {
                 setEnableHistory(data.enable_history !== false);
             }
         } catch (err) {
-            console.log('Settings not available yet');
+            console.log('Server settings not available, using localStorage only');
         }
         setLoading(false);
     }
@@ -193,10 +199,23 @@ export default function Settings({ isOpen, onClose }) {
         setLoading(true);
         setError(null);
         try {
-            const payload = {
+            // SECURE: Save AI credentials to localStorage ONLY (never to server)
+            const localSettings = {
                 ai_provider: aiProvider,
                 custom_endpoint: customEndpoint,
                 custom_model: customModel,
+                ocr_provider: ocrProvider,
+            };
+
+            // Save new API key to localStorage if provided
+            if (aiApiKey.trim()) {
+                localSettings.ai_api_key = aiApiKey;
+            }
+
+            saveToLocalStorage(localSettings);
+
+            // Save non-sensitive settings to server (for OCR cloud providers, database, etc.)
+            const serverPayload = {
                 ocr_provider: ocrProvider,
                 azure_ocr_endpoint: azureOcrEndpoint,
                 custom_ocr_endpoint: customOcrEndpoint,
@@ -205,59 +224,65 @@ export default function Settings({ isOpen, onClose }) {
                 python_path: pythonPath,
                 database_url: databaseUrl,
                 enable_history: enableHistory
+                // NOTE: AI API keys are NOT sent to server anymore!
             };
 
-            // Only include keys if user entered a new one
-            if (aiApiKey.trim()) {
-                payload.ai_api_key = aiApiKey;
-                payload.openai_api_key = aiProvider === 'openai' ? aiApiKey : '';
-            }
+            // OCR cloud provider keys (still stored on server for now)
             if (googleVisionKey.trim()) {
-                payload.google_vision_key = googleVisionKey;
+                serverPayload.google_vision_key = googleVisionKey;
             }
             if (azureOcrKey.trim()) {
-                payload.azure_ocr_key = azureOcrKey;
+                serverPayload.azure_ocr_key = azureOcrKey;
             }
             if (customOcrKey.trim()) {
-                payload.custom_ocr_key = customOcrKey;
+                serverPayload.custom_ocr_key = customOcrKey;
             }
             if (visionAiKey.trim()) {
-                payload.vision_ai_key = visionAiKey;
+                serverPayload.vision_ai_key = visionAiKey;
             }
 
-            const response = await fetch(`${BASE_URL}/api/settings`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            // Try to save to server (but don't fail if backend is not available)
+            try {
+                const response = await fetch(`${BASE_URL}/api/settings`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(serverPayload)
+                });
 
-            if (response.ok) {
-                // Clear key inputs after successful save (keys are now hidden)
-                if (aiApiKey.trim()) {
-                    setAiKeyIsSaved(true);
-                    setAiApiKey('');
+                if (!response.ok) {
+                    console.warn('Server settings save failed, but localStorage saved');
                 }
-                if (googleVisionKey.trim()) {
-                    setGoogleKeyIsSaved(true);
-                    setGoogleVisionKey('');
-                }
-                if (azureOcrKey.trim()) {
-                    setAzureKeyIsSaved(true);
-                    setAzureOcrKey('');
-                }
-
-                setSaved(true);
-                setTimeout(() => setSaved(false), 2000);
-            } else {
-                throw new Error('Failed to save settings');
+            } catch (serverErr) {
+                console.warn('Could not save to server, but localStorage is saved');
             }
+
+            // Clear key inputs after successful save
+            if (aiApiKey.trim()) {
+                setAiKeyIsSaved(true);
+                setAiApiKey('');
+            }
+            if (googleVisionKey.trim()) {
+                setGoogleKeyIsSaved(true);
+                setGoogleVisionKey('');
+            }
+            if (azureOcrKey.trim()) {
+                setAzureKeyIsSaved(true);
+                setAzureOcrKey('');
+            }
+
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
         } catch (err) {
-            setError('Failed to save settings. Make sure the backend is running.');
+            setError('Failed to save settings.');
         }
         setLoading(false);
     }
 
     function handleClearAll() {
+        // Clear localStorage (secure storage)
+        clearAllSettings();
+
+        // Reset UI state
         setAiProvider('openai');
         setAiApiKey('');
         setAiKeyIsSaved(false);
@@ -268,11 +293,10 @@ export default function Settings({ isOpen, onClose }) {
         setAzureOcrKey('');
         setAzureKeyIsSaved(false);
         setAzureOcrEndpoint('');
-        setOcrProvider('paddle');
+        setOcrProvider('none');
         setDatabaseUrl('');
         setEnableHistory(true);
         setDbTestResult(null);
-        localStorage.removeItem('openai_api_key');
     }
 
     async function handleTestDatabase() {

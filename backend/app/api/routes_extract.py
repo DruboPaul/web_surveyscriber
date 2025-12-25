@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import Optional
 import os
@@ -30,6 +30,26 @@ from backend.app.db.models import UsageHistory
 # Note: Using FastAPI BackgroundTasks instead of Celery for simpler deployment
 
 router = APIRouter(tags=["Extract"])
+
+
+def get_credentials_from_request(request: Request) -> dict:
+    """
+    Extract AI credentials from request headers.
+    This allows per-user API keys stored in browser localStorage.
+    
+    Headers:
+    - X-AI-Provider: openai, anthropic, google, custom
+    - X-AI-API-Key: The user's API key
+    - X-Custom-Endpoint: Custom API endpoint (for local LLMs)
+    - X-Custom-Model: Custom model name
+    """
+    return {
+        "ai_provider": request.headers.get("X-AI-Provider", ""),
+        "ai_api_key": request.headers.get("X-AI-API-Key", ""),
+        "custom_endpoint": request.headers.get("X-Custom-Endpoint", ""),
+        "custom_model": request.headers.get("X-Custom-Model", ""),
+    }
+
 
 # Track current OCR language for reinitialization
 _current_ocr_language = None
@@ -262,10 +282,13 @@ def update_job_progress(job_id: str, processed: int, total: int, status: str = "
     return progress_data
 
 
-def process_batch_background(job_id: str, batch_id: str, schema: dict, custom_filename: str = None):
+def process_batch_background(job_id: str, batch_id: str, schema: dict, custom_filename: str = None, user_credentials: dict = None):
     """
-    Background task that processes images and updates Redis with progress.
+    Background task that processes images and updates progress.
     This runs in a thread, allowing the endpoint to return immediately.
+    
+    Args:
+        user_credentials: Dict with AI credentials from request headers (per-user secure keys)
     """
     import time as time_module
     start_time = time_module.time()
@@ -280,8 +303,23 @@ def process_batch_background(job_id: str, batch_id: str, schema: dict, custom_fi
     # Update status to processing with initial stage
     update_job_progress(job_id, 0, total, "processing", stage="Initializing... Please wait patiently 🙏")
     
-    # Load settings
+    # Load server settings (for OCR config, etc.)
     settings = load_settings()
+    
+    # Merge user credentials (from headers) with server settings
+    # User credentials take priority for AI keys (secure per-user storage)
+    if user_credentials:
+        if user_credentials.get("ai_api_key"):
+            settings["ai_api_key"] = user_credentials["ai_api_key"]
+        if user_credentials.get("ai_provider"):
+            settings["ai_provider"] = user_credentials["ai_provider"]
+        if user_credentials.get("custom_endpoint"):
+            settings["custom_endpoint"] = user_credentials["custom_endpoint"]
+        if user_credentials.get("custom_model"):
+            settings["custom_model"] = user_credentials["custom_model"]
+    
+    print(f"   AI Provider: {settings.get('ai_provider', 'openai')}")
+    print(f"   API Key: {'***' + settings.get('ai_api_key', '')[-4:] if settings.get('ai_api_key') else 'NOT SET'}")
     
     results = []
     
@@ -513,10 +551,13 @@ def process_batch_background(job_id: str, batch_id: str, schema: dict, custom_fi
 
 
 @router.post("/batch/async")
-def extract_batch_async(payload: ExtractAsyncRequest, background_tasks: BackgroundTasks):
+def extract_batch_async(payload: ExtractAsyncRequest, background_tasks: BackgroundTasks, request: Request):
     """
     Start batch processing in background.
     Returns job_id immediately for progress tracking via polling.
+    
+    Accepts AI credentials from request headers (X-AI-Provider, X-AI-API-Key, etc.)
+    for secure per-user API key handling.
     
     Use GET /batch/status/{job_id} to check progress.
     """
@@ -536,7 +577,10 @@ def extract_batch_async(payload: ExtractAsyncRequest, background_tasks: Backgrou
     # Generate unique job ID
     job_id = str(uuid.uuid4())
     
-    # Initialize progress in Redis
+    # Get credentials from request headers (per-user secure storage)
+    user_credentials = get_credentials_from_request(request)
+    
+    # Initialize progress
     update_job_progress(job_id, 0, len(files), "queued")
     
     # Start background processing (runs in thread, non-blocking)
@@ -545,7 +589,8 @@ def extract_batch_async(payload: ExtractAsyncRequest, background_tasks: Backgrou
         job_id=job_id,
         batch_id=payload.batch_id,
         schema=payload.schema,
-        custom_filename=payload.custom_filename
+        custom_filename=payload.custom_filename,
+        user_credentials=user_credentials  # Pass credentials to background task
     )
     
     return {
