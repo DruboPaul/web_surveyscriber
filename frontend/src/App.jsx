@@ -885,6 +885,19 @@ function App() {
           {/* Footer */}
           <footer className="footer">
             <p>SurveyScriber • Handwritten Survey Data Extraction</p>
+            <div className="footer-contact">
+              <p className="developer">Developed by <strong>Drubo Paul</strong></p>
+              <p className="contact-info">
+                <a href="mailto:pdrubo064@gmail.com">pdrubo064@gmail.com</a>
+                {' • '}
+                <a href="mailto:pauldruboraj064@gmail.com">pauldruboraj064@gmail.com</a>
+              </p>
+              <p className="contact-info">
+                <a href="tel:+8801856365064">+880 1856-365064</a>
+                {' • '}
+                <a href="tel:+8801757836300">+880 1757-836300</a>
+              </p>
+            </div>
           </footer>
         </div>
       )}

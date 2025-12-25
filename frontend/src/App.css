@@ -985,6 +985,37 @@ body {
   border-top: 1px solid var(--border);
 }
 
+.footer-contact {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.footer-contact .developer {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.footer-contact .developer strong {
+  color: var(--primary-light);
+}
+
+.footer-contact .contact-info {
+  font-size: 0.85rem;
+  margin: 0.25rem 0;
+}
+
+.footer-contact .contact-info a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-contact .contact-info a:hover {
+  color: var(--primary-light);
+}
+
 /* ================================================
    Responsive - Tablet
    ================================================ */
