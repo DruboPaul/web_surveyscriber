@@ -3,9 +3,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api import upload_router, extract_router, settings_router
-from app.api.routes_usage import router as usage_router
-from app.db.database import Base, get_engine, init_database
+from backend.app.api import upload_router, extract_router, settings_router
+from backend.app.api.routes_usage import router as usage_router
+from backend.app.db.database import Base, get_engine, init_database
 
 # ===============================
 # Create database tables on startup
