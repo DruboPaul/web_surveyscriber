@@ -14,6 +14,9 @@ import SetupScreen from "./components/SetupScreen";
 import { isSetupComplete, startBackendWithEmbeddedPython } from "./setup";
 import "./App.css";
 
+// Dynamic BASE_URL from environment variable (for API calls)
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 // Detect if running in Tauri environment - check multiple ways
 const checkIsTauri = () => {
   // Check for Tauri internals (most reliable for Tauri v2)
@@ -231,7 +234,7 @@ function App() {
         const maxRetries = justCompletedSetup ? 20 : 10;
         for (let i = 0; i < maxRetries; i++) {
           try {
-            const response = await fetch('http://localhost:8000/api/settings/raw');
+            const response = await fetch(`${BASE_URL}/api/settings/raw`);
             if (response.ok) {
               console.log('✅ Backend is ready!');
               return;
@@ -252,7 +255,7 @@ function App() {
           // Wait a bit more after fallback start
           for (let i = 0; i < 15; i++) {
             try {
-              const response = await fetch('http://localhost:8000/api/settings/raw');
+              const response = await fetch(`${BASE_URL}/api/settings/raw`);
               if (response.ok) {
                 console.log('✅ Backend is ready (after fallback start)!');
                 return;

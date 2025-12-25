@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { testAiConnection } from '../api/backend';
 import './Settings.css';
 
+// Dynamic BASE_URL from environment variable
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 // Dynamic import for Tauri save dialog (only works in Tauri environment)
 const downloadUsageReport = async (period) => {
     try {
-        const BASE_URL = "http://localhost:8000";
         const response = await fetch(`${BASE_URL}/api/usage/report/download?period=${period}`);
 
         if (!response.ok) {
@@ -46,7 +48,7 @@ const downloadUsageReport = async (period) => {
     }
 };
 
-const BASE_URL = "http://localhost:8000";
+// BASE_URL is now defined at the top of the file
 
 // AI Provider definitions
 const AI_PROVIDERS = [
